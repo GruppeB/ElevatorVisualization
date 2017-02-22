@@ -7,8 +7,9 @@ float energicity=3; //Max velocity multiplier. 0 for constant speed
 
 int numElevators;
 int[][] data; //Timetable, loaded from .txt
-int iterator=0;
-int maxIt;
+int[] iterator;
+int[] maxIt;
+int[] offset;
 int N=5;
 ArrayList<ArrayList<Person>> people = new ArrayList<ArrayList<Person>>();
 ArrayList<Elevator> elevators=new ArrayList<Elevator>();
@@ -17,7 +18,7 @@ int timer=0;
 int[] peopleInFloors=new int[13]; //How many people are on each floor
 
 void setup() {
-  size(200, 650);//(40*s,130*s)
+  size(240, 650);//(30+numElevators,130)*s
   if(width==200){
     data=importData("morningRush.txt");
   }else if(width==240){
@@ -28,37 +29,24 @@ void setup() {
     people.add(new ArrayList<Person>());
   }
   for(int i=0;i<numElevators;i++){
-    elevators.add(new Elevator());
+    elevators.add(new Elevator(i));
   }
 }
 
 void draw() {
   drawBackground();
-  //drawColour();
   elevatorUpdate();
   for(int i=0;i<numElevators;i++){
     elevators.get(i).drawElevator();
   }
   drawPeople();
-  
-}
-
-void drawColour(){
-  for(int i=0;i<=255;i++){
-    noStroke();
-    fill(i,255-i,0);
-    rect(60,2*i,50,2);
-  }
 }
 
 void drawBackground() {
   stroke(0);
   fill(0);
   background(255);
-  /*text("ev:"+ev,2*s,5*s);
-  text("pv:"+pv,11*s,5*s);*/
   for(int i=1;i<=numElevators;i++){
-    println(numElevators);
     line(10*s*i, 0, 10*s*i, height);
   }
   
@@ -67,37 +55,52 @@ void drawBackground() {
     fill(0);
     text(i, width*0.9, (130-(-5+i*10))*s);
     fill(255,0,0);
-    text(peopleInFloors[i-1],width*0.9,(129-((i-1)*10))*s);
+    //text(peopleInFloors[i-1],width*0.9,(129-((i-1)*10))*s);
     text(people.get(i).size(),(numElevators*10+5)*s,(129-((i-1)*10))*s);
   }
-  fill(0);
-  text(timer++,width/2,30);
+  /*fill(0);
+  text(timer++,width/2,30);*/
 }
 
 int[][] importData(String filename) {
   String[] schedule=loadStrings(filename);
-  maxIt=schedule.length-2;
+  numElevators=int(schedule[0]); //1st line
   
+  maxIt=new int[numElevators]; //maxIt
+  for(int i=2;i<schedule.length;i++){
+    int[] line=int(split(schedule[i], ' '));
+    maxIt[line[0]-1]++;
+  }
+
+  int[][] data=new int[schedule.length-2][4];
+  iterator=new int[numElevators];
   
-  numElevators=int(schedule[0]); //1st line //<>//
-  int[][] data=new int[maxIt][3+numElevators];
-  
-  int[] line=int(split(schedule[1], ' ')); //2nd line
+  int[] line=int(split(schedule[1], ' ')); //3rd line
   for(int i=0;i<13;i++){
     peopleInFloors[i]=line[i];
   }
   
+  offset=new int[numElevators];
+  for(int i=0;i<numElevators;i++){
+    for(int j=i+1;j<numElevators;j++){
+      offset[j]+=maxIt[i];
+    }
+  }
+  
+  int[] iterations=new int[numElevators];
   for (int i=0; i<schedule.length-2; i++) { //Rest of file
     line=int(split(schedule[i+2], ' '));
-    for (int j=0; j<3+numElevators; j++) {
-      data[i][j]=line[j];
+    int elevatorNumber=line[0]-1;
+    for (int j=0; j<4; j++) {
+      data[offset[elevatorNumber]+iterations[elevatorNumber]][j]=line[j+1];
     }
+    iterations[elevatorNumber]++;
   }
   return data;
 }
 
 void drawPeople(){
-  for(int floor=0;floor<14;floor++){
+  for(int floor=0;floor<people.size();floor++){
     for(int i=0;i<people.get(floor).size();i++){
       people.get(floor).get(i).display(floor);
     }
@@ -127,24 +130,27 @@ class Person{
     timeWaited=iTime;
     ypos=(13.5-floor)*10*s;
     xvel=pv*(random(s)+1);
-    yvel=pv*random(s);
-    if(floor==0){//Person is inside elevator
+    yvel=pv*(random(s)+1);
+    if(floor==0){//Person is inside elevator 1
       xpos=10*s;
       ypos=elevators.get(0).yposE+5*s;
-      N=(13-floor)*10*s;
       E=10*s;
-      S=(14-floor)*10*s;
       W=0;
-    }else{
+    }else if(floor<14){//Person is in the building
       if(removable){
-        xpos=50;
+        xpos=(numElevators)*10*s;
       }else{
         xpos=width;
       }
       N=(13-floor)*10*s;
       E=width;
       S=(14-floor)*10*s;
-      W=10*s;
+      W=(numElevators)*10*s;
+    }else{//Person is in one of the other elevators
+      xpos=10*s*(floor-12);
+      ypos=elevators.get(floor-13).yposE+5*s;
+      E=10*s*(floor-12);
+      W=10*s*(floor-13);
     }
   }
   
@@ -183,36 +189,45 @@ class Person{
         }
       }
       people.get(floor).remove(rightPerson);
-      peopleInFloors[floor-1]++;
+      if(floor<14){
+        peopleInFloors[floor-1]++;
+      }
     }
   }
 }
 
 class Elevator{
-  float yposE, yvelE;
+  int numberE;
+  float yposE, yvelE, xposE;
   int waited=0;
   color c=color(random(255),random(255),255);
-  Elevator(){
+  Elevator(int inumberE){
     yposE=0;
     yvelE=0;
+    xposE=inumberE*10*s;
+    numberE=inumberE;
+    if(numberE>0){
+      numberE=13+numberE;
+    }
   }
   
   void drawElevator() {
     stroke(c);
     fill(c);
-    rect(0, yposE, 10*s, 10*s);
+    rect(xposE, yposE, 10*s, 10*s);
+    //text(numberE, numberE*5, 10);
 
-    for(int i=0;i<people.get(0).size();i++){//Sets boundaries for people in elevator
-      people.get(0).get(i).N=yposE;
-      people.get(0).get(i).S=yposE+10*s;
-      people.get(0).get(i).ypos+=yvelE;
+    for(int i=0;i<people.get(numberE).size();i++){//Sets boundaries for people in elevator
+      people.get(numberE).get(i).N=yposE;
+      people.get(numberE).get(i).S=yposE+10*s;
+      people.get(numberE).get(i).ypos+=yvelE;
     }
   } 
 }
 
 void elevatorUpdate(){
   for(int i=0;i<numElevators;i++){
-      int dest=(13-data[iterator][i])*10*s;
+      int dest=(13-data[offset[i]+iterator[i]][0])*10*s;
       if(elevators.get(i).yposE<dest){
         elevators.get(i).yvelE=s*ev;
       }else if(elevators.get(i).yposE>dest){
@@ -221,18 +236,20 @@ void elevatorUpdate(){
         elevators.get(i).yvelE=0;
         
         if(elevators.get(i).waited++!=waitTime){
-          return;
+          continue;
         }
-        elevators.get(i).waited=0; //<>//
-        if(data[iterator][2]==0){
-          addPeople(data[iterator][1], data[iterator][3]);
-        }else{
-          movePeople(data[iterator][1], data[iterator][2], data[iterator][3]);
+        elevators.get(i).waited=0;
+        int index=offset[i]+iterator[i];
+        if(data[index][1]!=0){//People to be moved is not 0
+          if(data[index][2]==0){//People arrive from building
+            addPeople(data[index][1], data[index][3]);
+          }else{//People move between floors and elevators
+            movePeople(data[index][1], data[index][2], data[index][3]);
+          }
         }
         
-        if(++iterator>=maxIt){
-          timer=0;
-          iterator=0;
+        if(++iterator[i]>=maxIt[i]){
+          iterator[i]=0;
         }
       }
       elevators.get(i).yposE+=elevators.get(i).yvelE;
@@ -240,7 +257,6 @@ void elevatorUpdate(){
 }
 
 void addPeople(int n, int floor){
-  
   for(int i=0;i<n;i++){
     people.get(floor).add(new Person(floor, false,0));
   }
@@ -248,7 +264,7 @@ void addPeople(int n, int floor){
 
 void deletePeople(int n, int floor){
   for(int i=0;i<n;i++){
-    people.get(floor).remove(0); //<>//
+    people.get(floor).remove(0);
   }
 }
 
@@ -257,7 +273,7 @@ void movePeople(int n, int start, int dest){
     if(start==-1){
       start=0;
     }else{
-      start=13-start;
+      start=12-start;
     }
   }
   
@@ -265,7 +281,7 @@ void movePeople(int n, int start, int dest){
     if(dest==-1){
       dest=0;
     }else{
-      dest=13-start;
+      dest=12-dest;
     }
   }
   
@@ -275,10 +291,18 @@ void movePeople(int n, int start, int dest){
   }
 }
 
-/*void mousePressed(){            
-  if(mouseX<10*s){                //Never use == on floating point numbers :(
-    //ev=2*float(mouseY)/height;    //Elevator oscillates around destination, but never hits it.
-  }else{
-    pv=2*float(mouseY)/height;
+void reset(){
+  for(int i=0;i<numElevators;i++){
+    elevators.get(i).yposE=0;
+    elevators.get(i).waited=0;
+    iterator[i]=0;
   }
-}*/
+  peopleInFloors=new int[13];
+  for(int floor=0;floor<people.size();floor++){
+    people.get(floor).clear();
+  }
+}
+
+void mousePressed(){            
+  reset(); //<>//
+}
