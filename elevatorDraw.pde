@@ -19,14 +19,8 @@ int timer=0;
 int[] peopleInFloors=new int[13]; //How many people are on each floor
 
 void setup() {
-  size(300, 650);//(30+10*numElevators,130)*s
-  if (width==200) {
-    data=importData("timeTest.txt");
-  } else if (width==250) {
-    data=importData("timeTest2.txt");
-  }else if (width==300) {
-    data=importData("timeTest3.txt");
-  }
+  data=importData("timeTest2.txt");
+  surface.setSize((30+10*numElevators)*s,130*s);
   
   for (int floor=0; floor<13+numElevators; floor++) {
     people.add(new ArrayList<Person>());
