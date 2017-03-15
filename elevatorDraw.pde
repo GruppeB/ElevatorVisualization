@@ -18,10 +18,10 @@ int timer=0;
 int[] peopleInFloors=new int[13]; //How many people are on each floor
 
 void setup() {
-  size(240, 650);//(30+numElevators,130)*s
+  size(250, 650);//(30+numElevators,130)*s
   if(width==200){
     data=importData("morningRush.txt");
-  }else if(width==240){
+  }else if(width==250){
     data=importData("doubleMorningRush.txt");
   }
   
@@ -303,6 +303,12 @@ void reset(){
   }
 }
 
-void mousePressed(){            
-  reset(); //<>//
+void mousePressed(){
+  if(mouseButton==LEFT){
+    reset(); //<>//
+  }else{
+    for(int i=0;i<numElevators;i++){
+      elevators.get(i).c=color(random(255),random(255),255);
+    }
+  }
 }
