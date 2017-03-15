@@ -34,6 +34,17 @@ void update(){
       elevators.get(i).yvelE=float(data[iterator+1][1+i]-data[iterator][1+i])/time;
       elevators.get(i).yposE+=elevators.get(i).yvelE;
     }
+  }else{
+    for(int i=0;i<numElevators;i++){
+      elevators.get(i).yposE=data[iterator+1][i+1];
+      int elevatorIndex=0;
+      if(i>0){
+        elevatorIndex+=13;
+      }
+      for(int j=0;j<people.get(elevatorIndex).size();j++){
+        people.get(elevatorIndex).get(j).ypos+=data[iterator+1][i+1]-data[iterator][i+1];
+      }
+    }
   }
   if (timer>=data[iterator+1][0]) { //Next step
     if(++iterator>=maxIt || (timer>=timerEnd && timerEnd!=0)){

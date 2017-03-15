@@ -113,7 +113,9 @@ void movePeople(int n, int start, int dest) {
   }
 
   for (int i=0; i<n; i++) {
-    people.get(start).remove(0);
+    if(people.get(start).size()>0){
+      people.get(start).remove(0);
+    }
     people.get(dest).add(new Person(dest, true, 0));
   }
 }

@@ -4,14 +4,14 @@ float ev=0.5; //Elevator velocity
 int waitTime=50; //Time elevator waits on each floor
 float patience=5; //Slowness of colour change
 float energicity=3; //Max velocity multiplier. 0 for constant speed
-float timerDampening=10; //How slow animation runs
+float timerDampening=0.5; //How slow animation runs
 
 String filename="david10.txt";
-int itStart=0; //Line start and end number. 0 for file start or end. 
+int itStart=7555; //Line start and end number. 0 for file start or end. 
 int itEnd=0;
 
 int timerStart=0; //Start time
-int timerEnd=0; //End time. 0 for to EoF
+int timerEnd=0; //End time.
 int elevatorYStart=600;
 int numElevators;
 int[][] data; //Timetable, loaded from .txt
@@ -65,10 +65,30 @@ void drawBackground() {
     //text(peopleInFloors[i-1],width*0.9,(129-((i-1)*10))*s);
     text(people.get(i).size(), (numElevators*10+5)*s, (129-((i-1)*10))*s);
   }
-  fill(0);
-  text(int(timer++/timerDampening), width/2, 30);
+  drawClock();
 }
 
+void drawClock(){
+  fill(0);
+  float clock=timer++/timerDampening;
+  int w=width/2;
+  text(int(clock), w-7, 15);
+  int hour=int(clock/3600);
+  int minute=int((clock%3600)/60);
+  if(hour<10){
+    text('0',w-7,30);
+    text(hour,w,30);
+  }else{
+    text(hour,w-6,30);
+  }
+  text(':',w+8,30);
+  if(minute<10){
+    text('0',w+12,30);
+    text(minute,w+19,30);
+  }else{
+    text(minute,w+12,30);
+  }
+}
 int[][] importData(String filename) {
   String[] schedule=loadStrings(filename);
   numElevators=int(schedule[0]); //1st line
@@ -101,8 +121,8 @@ int[][] importData(String filename) {
   timerEnd=int(data[itEnd][0]);
   timerStart=int(data[itStart][0]); //Start time
   timer=timerStart;
-  maxIt=itEnd;
-
+  maxIt=itEnd; 
+  iterator=itStart;
   return data;
 }
 
