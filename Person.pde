@@ -97,7 +97,6 @@ void deletePeople(int n, int floor) {
 }
 
 void movePeople(int n, int start, int dest) {
-
   if (start<0) {
     if (start==-1) {
       start=0;
@@ -105,7 +104,6 @@ void movePeople(int n, int start, int dest) {
       start=12-start;
     }
   }
-  
   if (dest<0) {
     if (dest==-1) {
       dest=0;
@@ -115,7 +113,7 @@ void movePeople(int n, int start, int dest) {
   }
 
   for (int i=0; i<n; i++) {
-    people.get(dest).add(new Person(dest, true, people.get(start).get(0).timeWaited)); //<>//
     people.get(start).remove(0);
+    people.get(dest).add(new Person(dest, true, 0));
   }
 }
