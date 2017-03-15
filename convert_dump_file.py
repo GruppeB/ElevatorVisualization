@@ -12,11 +12,16 @@ def line_to_numbers(line):
     return numbers
 
 def numbers_diff(p, n, elevators):
-    return n[0:1+elevators] + [i - j for i, j in zip(p[1+elevators:], n[1+elevators:])]
+    return n[0:1+elevators] + [j - i for i, j in zip(p[1+elevators:], n[1+elevators:])]
 
-def scale_positions(numbers, scale, elevators):
+def scale_positions(numbers, scale, elevators, floors):
     for i in range(1, elevators+1):
-        numbers[i] *= scale
+        numbers[i] = int((floors - numbers[i] - 1) * scale)
+
+def print_numbers(numbers, prev_numbers, elevators):
+    array = list(map(str, numbers_diff(prev_numbers, numbers, elevators)))
+    array = array[:1+elevators] + array[1+2*elevators:] + array[1+elevators:1+2*elevators]
+    print(' '.join(array))
 
 def run(args):
     E, F = [int(x) for x in sys.stdin.readline().split()]
@@ -25,8 +30,8 @@ def run(args):
     prev_numbers = line_to_numbers(sys.stdin.readline())
     for line in sys.stdin:
         numbers = line_to_numbers(line)
-        scale_positions(numbers, args.position_scale, E)
-        print(' '.join(map(str, numbers_diff(prev_numbers, numbers, E))))
+        scale_positions(numbers, args.position_scale, E, F)
+        print_numbers(numbers, prev_numbers, E)
         prev_numbers = numbers
 
 
