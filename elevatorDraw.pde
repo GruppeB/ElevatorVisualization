@@ -6,7 +6,7 @@ float patience=5; //Slowness of colour change
 float energicity=3; //Max velocity multiplier. 0 for constant speed
 float timerDampening=10; //How slow animation runs
 
-String filename="david7.txt";
+String filename="david10.txt";
 int itStart=0; //Line start and end number. 0 for file start or end. 
 int itEnd=0;
 
@@ -66,7 +66,7 @@ void drawBackground() {
     text(people.get(i).size(), (numElevators*10+5)*s, (129-((i-1)*10))*s);
   }
   fill(0);
-  text(timer++/10, width/2, 30);
+  text(int(timer++/timerDampening), width/2, 30);
 }
 
 int[][] importData(String filename) {
@@ -102,6 +102,7 @@ int[][] importData(String filename) {
   timerStart=int(data[itStart][0]); //Start time
   timer=timerStart;
   maxIt=itEnd;
+
   return data;
 }
 
