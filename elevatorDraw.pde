@@ -4,10 +4,10 @@ float ev=0.5; //Elevator velocity
 int waitTime=50; //Time elevator waits on each floor
 float patience=5; //Slowness of colour change
 float energicity=3; //Max velocity multiplier. 0 for constant speed
-float timerDampening=0.5; //How slow animation runs
+float timerDampening=0.01; //How slow animation runs
 
-String filename="david10.txt";
-int itStart=7555; //Line start and end number. 0 for file start or end. 
+String filename="davidErKul.txt";
+int itStart=0; //Line start and end number. 0 for file start or end. 
 int itEnd=0;
 
 int timerStart=0; //Start time
@@ -28,15 +28,13 @@ void setup() {
   data=importData(filename);
   surface.setSize((30+10*numElevators)*s, 130*s);
   makestuff();
-  doPeople();
+  //doPeople();
 }
 
 void draw() {
   drawBackground();
   update();
-  for (int i=0; i<numElevators; i++) {
-    elevators.get(i).drawElevator();
-  }
+  drawElevators();
   drawPeople();
 }
 
@@ -141,7 +139,7 @@ void reset() {
 }
 
 void mousePressed() {
-  if (mouseButton==LEFT) {
+  if (mouseButton==LEFT) { //<>//
     //reset();
   } else {
     for (int i=0; i<numElevators; i++) {

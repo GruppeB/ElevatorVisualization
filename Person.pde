@@ -90,11 +90,11 @@ void addPeople(int n, int floor) {
   }
 }
 
-void deletePeople(int n, int floor) {
+/*void deletePeople(int n, int floor) {
   for (int i=0; i<n; i++) {
     people.get(floor).remove(0);
   }
-}
+}*/
 
 void movePeople(int n, int start, int dest) {
   if (start<0) {
@@ -113,8 +113,19 @@ void movePeople(int n, int start, int dest) {
   }
 
   for (int i=0; i<n; i++) {
-    if(people.get(start).size()>0){
-      people.get(start).remove(0);
+    if(0<start && start<14){ //Start is a floor
+      if(people.get(start).size()>0){
+        for(int j=0;j<people.get(start).size();j++){
+          if(!people.get(start).get(j).removable){
+            people.get(start).remove(j);
+            break;
+          }
+        }
+      }
+    }else{ //Start is an elevator
+      if(people.get(start).size()>0){
+        people.get(start).remove(0);
+      }
     }
     people.get(dest).add(new Person(dest, true, 0));
   }
