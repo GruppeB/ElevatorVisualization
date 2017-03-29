@@ -4,9 +4,9 @@ float ev=0.5; //Elevator velocity
 int waitTime=50; //Time elevator waits on each floor
 float patience=5; //Slowness of colour change
 float energicity=3; //Max velocity multiplier. 0 for constant speed
-float timerDampening=0.01; //How slow animation runs
+float timerDampening=0.1; //How slow animation runs
 
-String filename="davidErKul.txt";
+String filename="davidErAwzm.txt";
 int itStart=0; //Line start and end number. 0 for file start or end. 
 int itEnd=0;
 
@@ -89,11 +89,12 @@ void drawClock(){
 }
 int[][] importData(String filename) {
   String[] schedule=loadStrings(filename);
-  numElevators=int(schedule[0]); //1st line
+  int[] line=int(split(schedule[0], ' '));
+  numElevators=int(line[0]); //1st line //<>//
 
   int[][] data=new int[schedule.length-1][1+13+2*numElevators];
 
-  int[] line=int(split(schedule[1], ' ')); //2nd line
+  line=int(split(schedule[1], ' ')); //2nd line
   for (int i=0; i<13; i++) {
     peopleInFloors[i]=line[i];
   }
