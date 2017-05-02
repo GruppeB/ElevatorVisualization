@@ -4,10 +4,10 @@ import argparse
 import sys
 
 def line_to_numbers(line):
-    numbers = [float(x) for x in line.split()]
-    for i, number in enumerate(numbers):
-        if number.is_integer():
-            numbers[i] = int(number)
+    numbers = [int(float(x)) for x in line.split()]
+    # for i, number in enumerate(numbers):
+    #     if number.is_integer():
+    #         numbers[i] = int(number)
 
     return numbers
 
