@@ -6,8 +6,8 @@ float patience=5; //Slowness of colour change
 float energicity=3; //Max velocity multiplier. 0 for constant speed
 float timerDampening=5; //How slow animation runs
 
-String filename="davidErAwzm.txt";
-int itStart=2000; //Line start and end number. 0 for file start or end. 
+String filename="input.txt";
+int itStart=0; //Line start and end number. 0 for file start or end. 
 int itEnd=0;
 
 int timerStart=0; //Start time
