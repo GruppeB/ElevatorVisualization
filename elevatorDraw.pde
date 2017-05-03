@@ -4,10 +4,10 @@ float ev=0.5; //Elevator velocity
 int waitTime=50; //Time elevator waits on each floor
 float patience=5; //Slowness of colour change
 float energicity=3; //Max velocity multiplier. 0 for constant speed
-float timerDampening=0.1; //How slow animation runs
+float timerDampening=5; //How slow animation runs
 
 String filename="davidErAwzm.txt";
-int itStart=0; //Line start and end number. 0 for file start or end. 
+int itStart=2000; //Line start and end number. 0 for file start or end. 
 int itEnd=0;
 
 int timerStart=0; //Start time
